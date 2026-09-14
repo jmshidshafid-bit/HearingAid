@@ -6,10 +6,10 @@ import android.content.pm.PackageManager
 import android.media.AudioManager
 import android.os.Bundle
 import android.widget.Button
+import android.widget.RadioGroup
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +35,20 @@ class MainActivity : AppCompatActivity() {
         val statusText = findViewById<TextView>(R.id.statusText)
         val toggleButton = findViewById<Button>(R.id.toggleButton)
         val gainSeekBar = findViewById<SeekBar>(R.id.gainSeekBar)
+        val micSourceGroup = findViewById<RadioGroup>(R.id.micSourceGroup)
+
+        micSourceGroup.setOnCheckedChangeListener { _, checkedId ->
+            engine.micSource = if (checkedId == R.id.radioPhoneMic) {
+                MicSource.PHONE
+            } else {
+                MicSource.EARPHONE
+            }
+            // If currently listening, restart so the new mic takes effect.
+            if (isListening) {
+                engine.stop()
+                engine.start()
+            }
+        }
 
         gainSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
