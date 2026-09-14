@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -5,6 +6,28 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="32dp">
+
+    <RadioGroup
+        android:id="@+id/micSourceGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp">
+
+        <RadioButton
+            android:id="@+id/radioEarphoneMic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Earphone Mic"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radioPhoneMic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phone Mic"
+            android:layout_marginStart="24dp" />
+    </RadioGroup>
 
     <TextView
         android:id="@+id/statusText"
