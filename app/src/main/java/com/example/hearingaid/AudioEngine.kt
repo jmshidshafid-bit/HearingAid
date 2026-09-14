@@ -2,6 +2,7 @@
 package com.example.hearingaid
 
 import android.media.AudioAttributes
+import android.media.AudioDeviceInfo
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioRecord
@@ -13,6 +14,8 @@ import kotlin.math.abs
 import kotlin.math.sign
 import kotlin.math.tanh
 
+enum class MicSource { PHONE, EARPHONE }
+
 class AudioEngine(private val audioManager: AudioManager) {
 
     private val sampleRate = 44100
@@ -22,6 +25,10 @@ class AudioEngine(private val audioManager: AudioManager) {
 
     @Volatile
     var gain: Float = 3.0f
+
+    // Which mic to use - set this before calling start()
+    @Volatile
+    var micSource: MicSource = MicSource.EARPHONE
 
     private var audioRecord: AudioRecord? = null
     private var audioTrack: AudioTrack? = null
@@ -47,6 +54,20 @@ class AudioEngine(private val audioManager: AudioManager) {
             encoding,
             minRecordBuf * 2
         )
+
+        // Force the mic to be the phone's built-in one, or the earphone's,
+        // depending on what the user picked.
+        val inputDevices = audioManager.getDevices(AudioManager.GET_DEVICES_INPUTS)
+        val targetDevice = if (micSource == MicSource.PHONE) {
+            inputDevices.firstOrNull { it.type == AudioDeviceInfo.TYPE_BUILTIN_MIC }
+        } else {
+            inputDevices.firstOrNull {
+                it.type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                    it.type == AudioDeviceInfo.TYPE_USB_HEADSET ||
+                    it.type == AudioDeviceInfo.TYPE_USB_DEVICE
+            }
+        }
+        targetDevice?.let { audioRecord?.setPreferredDevice(it) }
 
         audioRecord?.audioSessionId?.let { sessionId ->
             if (AcousticEchoCanceler.isAvailable()) {
